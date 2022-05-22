@@ -24,11 +24,25 @@ contract ERC20 {
    mappping(address=> uint256) public balanceOf;
    mappping(address => mapping(address => unit256)) public allowance;
 
-   function transfer(address recipient, uint256 amount) external returns(bool) {
+   function transfer(msg.sender, address recipient, uint256 amount) external returns(bool) {
+       return _transfer(msg.sender, recipient, amount);
+   }
+
+    function transferFrom(address sender, address recipient, uint256 amount) external returns(bool) {
+       unit256 currentAllowance = allowance[sender][msg.sender];
+
+ 
+       require(currentAllowance >= amount, "ERC20: transfer amount excreed allowance");
+       allowance[sender][msg.sender] = currentAllowance - amount;
+
+       return _transfer(sender, recipient, amount);
+   }
+
+   function _transfer(address sender, address recipient, uint256 amount) external returns(bool) {
        require(recipient != address(0), "ERC20: transfer to the zero address");
-       unit256 senderBalance = balanceOf[msg.sender];
+       unit256 senderBalance = balanceOf[sender];
        require(senderBalance >= amount, "ERC20: transfer amount exceeds balance");
-       balanceOf[msg.sender] = senderBalance - amount;
+       balanceOf[sender] = senderBalance - amount;
        balanceOf[recipient] = balanceOf[recipient] + amount;
        return true;
    }
